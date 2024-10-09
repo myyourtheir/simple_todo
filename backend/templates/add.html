@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+		main {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			gap: 10px;
+			height: 100vh;
+		}
+
+		fieldset {
+			display: flex;
+			flex-direction: column;
+			justify-content: center;
+			align-items: center;
+			gap: 10px;
+		}
+
+		legend {
+			font-size: 20px;
+
+		}
+
+		button {
+			background: hsl(223, 84%, 78%);
+			border: none;
+			color: white;
+			padding: 10px;
+			border-radius: 5px;
+			cursor: pointer;
+			min-width: 100px;
+		}
+
+		a {
+			color: inherit;
+			text-decoration: none;
+			width: 100%;
+			background: hsl(223, 84%, 78%);
+			border: none;
+			color: white;
+			padding: 10px;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+
+		.buttons_container {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 10px;
+		}
+
+		textarea {
+			resize: none;
+			height: 60px;
+		}
+	</style>
+</head>
+
+<body>
+	<main>
+		<form id="form" onsubmit="addTask(event)">
+			<fieldset>
+				<legend>Add task</legend>
+				<label for="title">Title</label>
+				<input required type="text" id="title" name="title">
+				<label for="description">Description</label>
+				<textarea type="text" id="description" name="description"></textarea>
+				<div class="buttons_container">
+					<a href="/">
+						Cancel
+					</a>
+					<button id="add_delete" type="submit">Add</button>
+				</div>
+			</fieldset>
+		</form>
+	</main>
+	<script>
+		const api = "http://localhost:5555"
+		const id = window.location.pathname.split("/")[2]
+		if (id) {
+			document.querySelector("legend").innerText = "Edit task"
+			document.getElementById("add_delete").innerText = "Edit"
+		}
+		console.log(id)
+		function addTask(event) {
+			event.preventDefault()
+			const data = new FormData(form)
+			if (!id) {
+				fetch(`${api}/tasks`, { method: 'POST', body: data }).finally(() => window.location.replace("/"))
+			} else {
+				fetch(`${api}/tasks/${id}`, { method: 'PUT', body: data }).finally(() => window.location.replace("/"))
+			}
+		}
+	</script>
+</body>
+
+</html>

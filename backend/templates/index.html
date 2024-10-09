@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Document</title>
+	<style>
+		#container {
+			display: flex;
+			flex-direction: column;
+			justify-content: start;
+			align-items: center;
+			row-gap: 10px;
+			height: 100vh;
+		}
+
+		.task {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			gap: 10px;
+			width: 100%;
+			padding: 10px;
+			list-style: none;
+		}
+
+		.task_buttons_container {
+			display: flex;
+			column-gap: 10px;
+		}
+
+		button {
+			background: hsl(223, 84%, 78%);
+			border: none;
+			color: white;
+			padding: 10px;
+			border-radius: 5px;
+			cursor: pointer;
+		}
+
+		a {
+			color: inherit;
+			text-decoration: none;
+		}
+
+		h4 {
+			margin: 0;
+			font-size: 20px;
+		}
+
+		p {
+			margin: 5px;
+		}
+	</style>
+</head>
+
+<body>
+	<main id="container">
+		<h1>Simple Todo</h1>
+		<button>
+			<a href="/add">
+				Add task
+			</a>
+		</button>
+		<ul id="tasks">
+
+		</ul>
+	</main>
+	<script>
+		const api = "http://localhost:5555"
+		fetch(`${api}/tasks`, { method: 'GET' })
+			.then(response => response.json())
+			.then(data => {
+				data.forEach(task => {
+					const taskElement = document.createElement("li")
+					taskElement.classList.add("task")
+					const hTaskElement = document.createElement("h4")
+					hTaskElement.classList.add("task_title")
+					const pTaskElement = document.createElement("p")
+					pTaskElement.classList.add("task_description")
+					hTaskElement.innerText = task.title
+					pTaskElement.innerText = task.description
+					editButtonElement = document.createElement("button")
+					editButtonElement.classList.add("edit_button")
+					editButtonElement.innerText = "Edit"
+					editButtonElement.addEventListener("click", () => {
+						window.location.href = `/add/${task.id}`
+					})
+					deleteButtonElement = document.createElement("button")
+					deleteButtonElement.classList.add("delete_button")
+					deleteButtonElement.innerText = "Delete"
+					deleteButtonElement.addEventListener("click", () => {
+						deleteTask(task.id)
+						window.location.reload()
+					})
+					const taskElementTextContainer = document.createElement("div")
+					taskElementTextContainer.classList.add("task_text_container")
+					taskElementTextContainer.appendChild(hTaskElement)
+					taskElementTextContainer.appendChild(pTaskElement)
+					taskElement.appendChild(taskElementTextContainer)
+					const taskElementButtonsContainer = document.createElement("div")
+					taskElementButtonsContainer.classList.add("task_buttons_container")
+
+					taskElementButtonsContainer.appendChild(editButtonElement)
+					taskElementButtonsContainer.appendChild(deleteButtonElement)
+					taskElement.appendChild(taskElementButtonsContainer)
+					document.getElementById("tasks").appendChild(taskElement)
+				})
+			})
+
+		function deleteTask(id) {
+			fetch(`${api}/tasks/${id}`, { method: 'DELETE' })
+		}
+	</script>
+</body>
+
+</html>
