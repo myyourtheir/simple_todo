@@ -1,0 +1,51 @@
+version: '3'
+services:
+  server:
+    build: ./backend
+    container_name: backend
+    environment:
+      - FLASK_ENV=development
+      - FLASK_APP=app.py
+      - PYTHONUNBUFFERED=True
+      - Postgre_URI=postgresql://todo:todo@db_todo:5432
+      - JWT_SECRET_KEY=8f677fc3efb9caf4bce0c4af723f784e
+      - SAME_SITE_AUTH_COOKIE=None
+    restart: on-failure
+    depends_on:
+      db_todo:
+        condition: service_healthy
+    volumes:
+      - ./backend:/app
+    ports:
+      - 5555:5000
+    command: flask run -h 0.0.0.0 -p 5000 --debug
+    networks:
+      - server_db
+
+  db_todo:
+    image: postgres:14.9
+    container_name: db_todo
+    environment:
+      - POSTGRES_USER=todo
+      - POSTGRES_PASSWORD=todo
+    volumes:
+      - ./default.sql:/docker-entrypoint-initdb.d/default.sql
+      - db_todo:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - server_db
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -q -U todo" ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  db_todo:
+    name: db_todo
+    driver: local
+
+networks:
+  server_db:
+    name: server_db
+    driver: bridge
