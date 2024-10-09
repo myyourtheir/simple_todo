@@ -30,10 +30,10 @@ def edit_task(id):
 
 @app.route("/tasks", methods=["GET", "POST"])
 def tasks():
-    if request.method == "POST":
-        title = request.form["title"]
-        description = request.form["description"]
-        with conn.cursor() as cur:
+    with conn.cursor() as cur:
+        if request.method == "POST":
+            title = request.form["title"]
+            description = request.form["description"]
             cur.execute(
                 "INSERT INTO tasks (title, description) VALUES (%s, %s);",
                 (title, description),
@@ -42,8 +42,7 @@ def tasks():
             cur.execute("SELECT * FROM tasks;")
             tasks = cur.fetchall()
             resp = make_response(tasks, 201)
-    if request.method == "GET":
-        with conn.cursor() as cur:
+        if request.method == "GET":
             cur.execute("SELECT * FROM tasks Order By created_at DESC;")
             tasks = cur.fetchall()
             prep_tasks = []
@@ -77,4 +76,5 @@ def delete_task(id):
                 (title, description, id),
             )
             conn.commit()
+            resp = make_response("OK", 200)
     return resp
